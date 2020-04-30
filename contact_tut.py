@@ -130,10 +130,11 @@ def add_session_to_contact():
         print(f'Name: {contact.name}')
         print(f'Previous hours worked: {contact.get_hours_worked()}')
         session_length = read_float('Session length: ')
-        if contact.add_session(session_length):
+        try:
+            contact.add_session(session_length)
             print(f'Updated hours worked: {contact.get_hours_worked()}')
-        else:
-            print('Add hours failed')
+        except Exception as e:
+            print('Add hours failed: ', e)
     else:
         print('This name was not found')
 
