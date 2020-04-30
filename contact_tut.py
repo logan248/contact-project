@@ -12,7 +12,7 @@ class Contact(object):
     max_session_length = 3.5
 
     def __init__(self, name, address, telephone = 'No telephone'):
-        self.name = name
+        self.__name = name
         self.address = address
         self.telephone = telephone
         self.hours_worked = 0
