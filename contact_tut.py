@@ -11,15 +11,72 @@ class Contact(object):
     min_session_length = 0.5
     max_session_length = 3.5
 
-    def __init__(self, name, address, telephone = 'No telephone'):
+    __min_text_length = 4
+    __open_fee = 30
+    __hourly_fee = 50
+
+    @staticmethod
+    def valid_text(text):
+        if len(text) < Contact.__min_text_length:
+            return False
+        else:
+            return True
+
+    @property
+    def name(self):
+        return self.__name
+    @name.setter
+    def name(self, name):
+        if not Contact.valid_text(name):
+            raise Exception('Invalid length')
         self.__name = name
+
+
+    @property
+    def address(self):
+        return self.__address
+    @address.setter
+    def address(self, address):
+        if not Contact.valid_text(address):
+            raise Exception('Invalid length')
+        self.__address = address
+
+
+
+    @property
+    def telephone(self):
+        return self.__telephone
+    @telephone.setter
+    def telephone(self, telephone):
+        self.__telephone = telephone
+
+
+    def __init__(self, name, address, telephone):
+        self.name = name
         self.address = address
         self.telephone = telephone
-        self.hours_worked = 0
+        self.__hours_worked = 0
+        self.__billing_amount = 0
+        self.__version = 1.0
+
 
 
     def get_hours_worked(self):
         return self.hours_worked
+
+    @property
+    def hours_worked(self):
+        return self.__hours_worked
+    @hours_worked.setter
+    def hours_worked(self, hours_worked):
+        return self.__hours_worked
+
+    @property
+    def billing_amount(self):
+        return self.__billing_amount
+
+    def check_version(self):
+        pass
 
     @staticmethod
     def validate_session_length(session_length):
@@ -32,7 +89,9 @@ class Contact(object):
     def add_session(self, session_length):
         if not Contact.validate_session_length(session_length):
             raise Exception('Invalid session length')
-        self.hours_worked = self.hours_worked + session_length
+        self.__hours_worked = self.__hours_worked + session_length
+        amount_to_bill = Contact.__open_fee + (Contact.__hourly_fee * session_length)
+        self.__billing_amount = amount_to_bill
         return True
 
 
@@ -65,6 +124,10 @@ def display_contact():
         print(f'Name: {contact.name}')
         print(f'Address: {contact.address}')
         print(f'Phone: {contact.telephone}')
+        print(f'Hours on the case: {contact.hours_worked}')
+        print(f'Amount to bill: {contact.billing_amount}')
+
+
 
     else:
         print('This name was not found')
@@ -101,6 +164,8 @@ def load_contact():
     global contacts
     with open(file_name, 'rb') as input_file:
         contacts = pickle.load(input_file)
+    for contact in contacts:
+        contact.check_version()
 
 
 def delete_contact():
@@ -128,11 +193,11 @@ def add_session_to_contact():
     contact = find_contact(search_name)
     if contact != None:
         print(f'Name: {contact.name}')
-        print(f'Previous hours worked: {contact.get_hours_worked()}')
+        print(f'Previous hours worked: {contact.hours_worked}')
         session_length = read_float('Session length: ')
         try:
             contact.add_session(session_length)
-            print(f'Updated hours worked: {contact.get_hours_worked()}')
+            print(f'Updated hours worked: {contact.hours_worked}')
         except Exception as e:
             print('Add hours failed: ', e)
     else:
