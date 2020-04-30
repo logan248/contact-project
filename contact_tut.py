@@ -59,11 +59,6 @@ class Contact(object):
         self.__billing_amount = 0
         self.__version = 1.0
 
-
-
-    def get_hours_worked(self):
-        return self.hours_worked
-
     @property
     def hours_worked(self):
         return self.__hours_worked
@@ -77,6 +72,19 @@ class Contact(object):
 
     def check_version(self):
         pass
+
+
+    def __str__(self):
+        details = f'''
+Name: {self.name}
+Address: {self.address}
+Telephone: {self.telephone}
+Hours on the case: {self.__hours_worked:.2f} hours
+Billing amount: ${self.__billing_amount:,.2f}
+'''
+        return details
+
+
 
     @staticmethod
     def validate_session_length(session_length):
@@ -101,7 +109,7 @@ def new_contact():
     name = read_text('Enter contact name: ')
     address = read_text('Enter contact address: ')
     telephone = read_text('Enter contact phone: ')
-    new_contact = Contact(name, address, telephone)
+    new_contact = Contact(name.strip(), address.strip(), telephone.strip())
     contacts.append(new_contact)
 
 
@@ -121,14 +129,7 @@ def display_contact():
     print('Find contact')
     contact = find_contact(read_text('Enter contact name: '))
     if contact != None:
-        print(f'Name: {contact.name}')
-        print(f'Address: {contact.address}')
-        print(f'Phone: {contact.telephone}')
-        print(f'Hours on the case: {contact.hours_worked}')
-        print(f'Amount to bill: {contact.billing_amount}')
-
-
-
+        print(contact)
     else:
         print('This name was not found')
 
