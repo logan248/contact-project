@@ -46,27 +46,6 @@ def new_contact():
     contacts.append(new_contact)
 
 
-def display_contact():
-    print('Find contact')
-    search_name = name = read_text('Enter contact name: ')
-    search_name = search_name.strip()
-    search_name = search_name.lower()
-    result = None
-    for contact in contacts:
-        name = contact.name
-        name = name.strip()
-        name = name.lower()
-        if name.startswith(search_name):
-            result = contact
-            break
-    if result != None:
-        print(f'Name: {contact.name}')
-        print(f'Address: {contact.address}')
-        print(f'Phone: {contact.telephone}')
-
-    else:
-        print('This name was not found')
-
 def find_contact(search_name):
     search_name = search_name.strip()
     search_name = search_name.lower()
@@ -79,16 +58,26 @@ def find_contact(search_name):
     return None
 
 
+def display_contact():
+    print('Find contact')
+    contact = find_contact(read_text('Enter contact name: '))
+    if contact != None:
+        print(f'Name: {contact.name}')
+        print(f'Address: {contact.address}')
+        print(f'Phone: {contact.telephone}')
+
+    else:
+        print('This name was not found')
+
+
 def edit_contact():
     print('Edit contact')
-    search = read_text('Name: ')
-    contact = find_contact(search)
+    contact = find_contact(read_text('Name: '))
     if contact != None:
         print('Enter (.) to leave unchaged')
         name = read_text('Name: ')
         address = read_text('Address: ')
-        telephone = read_text('Phone: ')
-
+        telephone = read_text('Telephone: ')
         if name != '.':
             contact.name = name
         if address != '.':
@@ -96,7 +85,7 @@ def edit_contact():
         if telephone != '.':
             contact.telephone = telephone
     else:
-        ('This name was not found')
+        print('This name was not found')
 
 
 def save_contact():
@@ -112,6 +101,25 @@ def load_contact():
     global contacts
     with open(file_name, 'rb') as input_file:
         contacts = pickle.load(input_file)
+
+
+def delete_contact():
+    print('Delete contact')
+    if len(contacts) == 0:
+        print('Contacts list empty!')
+    else:
+        contact = find_contact(read_text('Name: '))
+        confirm = read_text(f'Delete {contact.name}??\nYes or No: ')
+        confirm = confirm.strip()
+        confirm = confirm.lower()
+        option1, option2 = ['yes', 'y'], ['no', 'n']
+        if confirm in option1:
+            contacts.remove(contact)
+            print('Contact deleted successfully!')
+        elif confirm in option2:
+            print('Operation cancelled.')
+
+
 
 
 def add_session_to_contact():
@@ -141,6 +149,8 @@ except Exception:
     contacts = []
 else:
     print('Contacts loaded successfully!')
+finally:
+    print(f'Contacts available: {len(contacts)}')
 
 menu = '''Tiny Contact
 
@@ -149,7 +159,7 @@ menu = '''Tiny Contact
 3.Edit contact
 4.Add session
 5.Save contact
-6.Load contact
+6.Delete contact
 7.Exit program
 
 Enter command: '''
@@ -168,18 +178,8 @@ while True:
     elif command == 5:
         save_contact()
     elif command == 6:
-        print('Load contacts')
-        try:
-            load_contact()
-            for contact in contacts:
-                print(f'Name: {contact.name}')
-                print(f'Address: {contact.address}')
-                print(f'Phone: {contact.telephone}')
-                print(' ')
-        except Exception:
-            print('Something went wrong!')
-        else:
-            print('Contacts loaded successfully!')
+       delete_contact()
+       save_contact()
     elif command == 7:
         break
 
