@@ -31,7 +31,7 @@ class Contact(object):
 
     def add_session(self, session_length):
         if not Contact.validate_session_length(session_length):
-            return
+            raise Exception('Invalid session length')
         self.hours_worked = self.hours_worked + session_length
         return True
 
