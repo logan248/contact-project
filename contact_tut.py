@@ -2,9 +2,48 @@
 
 from inputs import *
 import pickle
+import time
 
 
 contacts = []
+
+class Session:
+    __min_session_length = 0.5
+    __max_session_length = 3.5
+
+    @staticmethod
+    def valid_session_length(session_length):
+        if session_length < Session.__min_session_length:
+            return False
+        elif session_length > Session.__max_session_length:
+            return False
+        return True
+
+    def __init__(self, session_length):
+        if not Session.valid_session_length(session_length):
+            raise Exception('Invalid session length')
+        self.__session_length = session_length
+        self.__session_end_time = time.localtime()
+        self.__version = 1.0
+
+
+    def check_version(self):
+        pass
+
+    @property
+    def session_length(self):
+        return self.__session_length
+
+    @property
+    def session_end_time(self):
+        return self.__session_end_time
+
+    def __str__(self):
+        date_string = time.asctime(self.session_end_time)
+        template = f'Date: {date_string} length: {self.__session_length}'
+        return template
+
+
 
 class Contact(object):
 
@@ -57,7 +96,8 @@ class Contact(object):
         self.telephone = telephone
         self.__hours_worked = 0
         self.__billing_amount = 0
-        self.__version = 1.0
+        self.__sessions = []
+        self.__version = 2.0
 
     @property
     def hours_worked(self):
@@ -71,7 +111,11 @@ class Contact(object):
         return self.__billing_amount
 
     def check_version(self):
-        pass
+        if self.__version == 1.0:
+            self.__sessions = []
+            self.__version = 2.0
+        for session in self.__sessions:
+            session.check_version()
 
 
     def __str__(self):
@@ -95,12 +139,22 @@ Billing amount: ${self.__billing_amount:,.2f}
         return True
 
     def add_session(self, session_length):
-        if not Contact.validate_session_length(session_length):
+        if not Session.valid_session_length(session_length):
             raise Exception('Invalid session length')
         self.__hours_worked = self.__hours_worked + session_length
         amount_to_bill = Contact.__open_fee + (Contact.__hourly_fee * session_length)
         self.__billing_amount = amount_to_bill
+        session_record = Session(session_length)
+        self.__sessions.append(session_record)
         return True
+
+    @property
+    def session_report(self):
+        report_strings = map(str, self.__sessions)
+        result = '\n'.join(report_strings)
+        return result
+
+
 
 
 
@@ -130,6 +184,7 @@ def display_contact():
     contact = find_contact(read_text('Enter contact name: '))
     if contact != None:
         print(contact)
+        print(contact.session_report)
     else:
         print('This name was not found')
 
